@@ -1,5 +1,5 @@
 import Navbar from "./Navbar";
-import "../Scss/Search.scss";
+import "../SCSS/Search.scss";
 export default function Search() {
   return (
     <>
