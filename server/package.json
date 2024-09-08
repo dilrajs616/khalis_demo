@@ -1,16 +1,30 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "",
+  "description": "server for the khalis demo project about creating punjabi transcript",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
-  "keywords": [],
-  "author": "",
+  "author": "Dilraj Singh",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "module-alias": "^2.2.3",
     "nodemon": "^3.1.4"
+  },
+  "_moduleAliases": {
+    "@root": ".",
+    "@startup": "app/startup",
+    "@routes": "app/routes",
+    "@controllers": "app/controllers",
+    "@middlewares": "app/middlewares",
+    "@views": "app/views",
+    "@helpers": "app/helper",
+    "@models": "app/models",
+    "@databases": "app/database",
+    "@configs": "config"
   }
 }
