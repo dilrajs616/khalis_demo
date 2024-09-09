@@ -5,16 +5,10 @@ const  path = require('path');
 // initializing express
 const express = require('express');
 const app = express();
-const expressLayouts = require('express-ejs-layouts');
 
 // setting up views
-app.set("view engine", "ejs");
-app.set('views', path.join(__dirname, './app/views'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
-app.use(expressLayouts);
-app.set('layouts', 'layouts/layout')
 
 // routes
 require('@routes/app.routes')(app);
