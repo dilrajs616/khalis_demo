@@ -2,4 +2,32 @@
 .search-parent-container {
   background: $color-background;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.content-container {
+  max-width: 800px;
+  width: 100%;
+}
+.timing-tab-container {
+  display: flex;
+  gap: 10px;
+  color: $color-tertiary;
+  font-family: $font-primary;
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;
+}
+.timing-label {
+  font-size: 1.5rem;
+}
+.timing-tab {
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.timing-tab-active {
+  background-color: $color-accent;
 }
