@@ -1,60 +1,66 @@
+require('dotenv').config()
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
-const path = require('path');
-const fs = require('fs');
-const util = require('util');
+const fetch = async () => (await import('node-fetch')).default;
 
-router.get('/', (req, res) => {
-    res.send("This is the home page");
+
+router.post("/transcript", async (req, res) => {
+    const { audioData } = req.body;
+    if (!audioData) {
+      return res.status(400).json({ error: "No audio data received" });
+    }
+
+    // Define the API endpoint and API key
+    const apiKey = process.env.GOOGLE_API_KEY;
+    const apiEndPoint = `https://speech.googleapis.com/v1/speech:recognize?key=${apiKey}`;
+
+    // Set up the request payload for the Google Cloud Speech-to-Text API
+    const requestBody = {
+      audio: {
+        content: audioData, // The base64-encoded audio data
+      },
+      config: {
+        encoding: "WEBM_OPUS", // Adjust the encoding if needed
+        sampleRateHertz: 48000,
+        languageCode: "pa-IN", // Punjabi language code
+      },
+    };
+
+    try {
+      // Import fetch dynamically
+      const fetchModule = await fetch();
+      const response = await fetchModule(apiEndPoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      // Check if the API response was successful
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Google API Error:", errorText);
+        return res.status(500).json({ error: "Error transcribing audio" });
+      }
+
+      // Parse the API response
+      const data = await response.json();
+
+      // Extract the transcript from the response
+      const transcript = data.results[0]?.alternatives[0]?.transcript || "No transcript available";
+
+      // Send the transcript back in the response
+      res.json({ message: "Transcription successful", transcript });
+    } catch (error) {
+      console.error("Error:", error.message);
+      res.status(500).json({ error: "Internal server error" });
+    }
 });
 
-router.post('/transcript', (req,res) => {
-    const { audioData } = req.body;
-
-    if (!audioData) {
-        console.log('error');
-        return res.status(400).json({ error: 'Audio data is required' });
-    }
-    const apiKey = process.env.GOOGLE_API_KEY;
-    const endpoint = `https://speech.googleapis.com/v1/speech:recognize?key=${apiKey}`
-
-    const body = {
-        "audio": {
-            "content": audioData
-        },
-        "config": {
-            "enableAutomaticPunctuation": true,
-            "encoding": "LINEAR16",
-            "languageCode": "pa-IN",
-            "model": "default"
-        }
-    }
-
-    axios.post(endpoint, body)
-    .then(response => {
-        console.log('Response from Google Speech-to-Text API:', response.data);
-
-        // Define the file path and name
-        const filePath = path.join(__dirname, 'full_response.txt');
-
-        // Serialize the entire response object, including circular references
-        const fullResponse = util.inspect(response.data, { depth: null, showHidden: true });
-
-        // Write the entire response object to a file
-        fs.writeFile(filePath, fullResponse, (err) => {
-            if (err) {
-                console.error('Error writing to file:', err);
-            } else {
-                console.log('Full response (with circular references) saved to file:', filePath);
-            }
-        });
-    })
-    .catch(error => {
-        console.error('Error sending request to Google Speech-to-Text API:', error);
-    });
-
-    res.status(200).json({ message: 'Audio received successfully' });
+router.post('/gurbani', async (req, res) => {
+  const transcript = "this endpoint is under work";
+  res.json({ message: "Working on it", transcript });
 });
 
 module.exports = router;
