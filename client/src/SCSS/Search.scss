@@ -2,4 +2,65 @@
 .search-parent-container {
   background: $color-background;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.content-container {
+  max-width: 800px;
+  width: 100%;
+}
+// .timing-tab-container {
+//   display: flex;
+//   gap: 10px;
+//   color: $color-tertiary;
+//   font-family: $font-primary;
+//   align-items: center;
+//   justify-content: center;
+//   margin-top: 50px;
+// }
+// .timing-label {
+//   font-size: 1.5rem;
+// }
+// .timing-tab {
+//   padding: 5px;
+//   border-radius: 5px;
+//   font-size: 1.5rem;
+//   cursor: pointer;
+// }
+// .timing-tab-active {
+//   background-color: $color-accent;
+// }
+.main-heading {
+  font-size: 2.8rem;
+  margin-top: 20px;
+  text-align: center;
+  font-family: $font-primary;
+  color: $color-tertiary;
+}
+.search-input-box-container {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#search-box {
+  width: 90%;
+  border-radius: 10px;
+  background-color: $color-secondary;
+  padding: 8px;
+  font-size: 1.28rem;
+  color: $color-tertiary;
+  border: 1px solid $color-primary;
+  outline: 0;
+}
+#search-box::-webkit-search-cancel-button {
+  appearance: none;
+}
+.mic-btn {
+  background-color: transparent;
+  border: 0;
+  outline: 0;
+  color: $color-primary;
+  cursor: pointer;
 }

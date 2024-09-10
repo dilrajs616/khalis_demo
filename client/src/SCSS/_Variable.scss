@@ -2,10 +2,11 @@
 * {
   margin: 0;
   padding: 0;
-  margin: 0;
+  box-sizing: border-box;
 }
 $color-primary: #fd9a10f1;
 $color-background: #1d1d1d;
 $color-secondary: #3a3a3a;
 $color-tertiary: #f8f8f8;
 $font-primary: "Roboto", sans-serif;
+$color-accent: #fd9a108e;
