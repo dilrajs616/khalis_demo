@@ -1,45 +1,65 @@
 import Navbar from "./Navbar";
 import "../SCSS/Search.scss";
-import { useState } from "react";
-import toast from "react-hot-toast";
+import { useRef, useState } from "react";
 import { CiMicrophoneOn } from "react-icons/ci";
 export default function Search() {
-  // const [timingForMic, settimingForMic] = useState(5);
-  // function handleTimingChange(time: number) {
-  //   settimingForMic(time);
-  //   toast.success(`Mic Time Changed to ${time} seconds`);
-  // }
+  const [isRecording, setisRecording] = useState(false);
+  const recorderRef = useRef<any>(null);
+  let chunks: any = [];
+  let result: any;
+  async function listenToVoice() {
+    if (isRecording) {
+      recorderRef.current.stop();
+      setisRecording(false);
+    } else {
+      let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      recorderRef.current = new MediaRecorder(stream);
+
+      recorderRef.current.ondataavailable = (e: any) => {
+        chunks.push(e.data);
+      };
+      recorderRef.current.onstop = async () => {
+        let voiceBlog = new Blob(chunks, { type: "audio/wav" });
+        chunks = [];
+
+        if (voiceBlog) {
+          let reader = new FileReader();
+          reader.readAsDataURL(voiceBlog);
+          reader.onload = async () => {
+            result = reader.result;
+            console.log(result);
+          };
+          let url = "gurbani-search.onrender.com/transcript";
+          try {
+            let response = await fetch(url, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ audioData: result }),
+            });
+            if (!response.ok) {
+              console.log("error", response.headers);
+            } else {
+              let data = await response.json();
+              console.log(data);
+            }
+          } catch (e: any) {
+            console.log(e.message);
+          }
+        }
+      };
+      recorderRef.current.start();
+      setisRecording(true);
+    }
+  }
+
   return (
     <>
       <div className="search-parent-container">
         <Navbar />
         <div className="content-container">
-          {/* <div className="timing-tab-container">
-            <label htmlFor="" className="timing-label">
-              Select Timing For Mic:
-            </label>
-            <div
-              className={
-                timingForMic === 5
-                  ? "timing-tab timing-tab-active"
-                  : "timing-tab"
-              }
-              onClick={() => handleTimingChange(5)}
-            >
-              5 sec
-            </div>
-            <div
-              className={
-                timingForMic === 10
-                  ? "timing-tab timing-tab-active"
-                  : "timing-tab"
-              }
-              onClick={() => handleTimingChange(10)}
-            >
-              10 sec
-            </div>
-          </div> */}
-          <div className="main-heading">Search Gurbani</div>
+          <div className="main-heading">ਗੁਰਬਾਣੀ ਖੋਜ</div>
           <div className="search-input-box-container">
             <input
               type="search"
@@ -47,7 +67,7 @@ export default function Search() {
               id="search-box"
             />
             <button className="mic-btn">
-              <CiMicrophoneOn size={45} />
+              <CiMicrophoneOn size={45} onClick={listenToVoice} />
             </button>
           </div>
         </div>
