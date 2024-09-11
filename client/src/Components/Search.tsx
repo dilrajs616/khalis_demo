@@ -15,21 +15,23 @@ export default function Search() {
       let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       recorderRef.current = new MediaRecorder(stream);
 
-      recorderRef.current.ondataavailable = (e: any) => {
+      recorderRef.current.ondataavailable = (e: BlobEvent) => {
         chunks.push(e.data);
       };
       recorderRef.current.onstop = async () => {
         let voiceBlog = new Blob(chunks, { type: "audio/wav" });
         chunks = [];
-
         if (voiceBlog) {
           let reader = new FileReader();
           reader.readAsDataURL(voiceBlog);
           reader.onload = async () => {
-            result = reader.result;
-            console.log(result);
+            result =
+              typeof reader.result == "string"
+                ? reader.result.split(",")[1]
+                : reader.result;
+            console.log(result, typeof result);
           };
-          let url = "gurbani-search.onrender.com/transcript";
+          let url = "https://gurbani-search.onrender.com/transcript";
           try {
             let response = await fetch(url, {
               method: "POST",
@@ -39,7 +41,7 @@ export default function Search() {
               body: JSON.stringify({ audioData: result }),
             });
             if (!response.ok) {
-              console.log("error", response.headers);
+              console.log("error", response.status);
             } else {
               let data = await response.json();
               console.log(data);
