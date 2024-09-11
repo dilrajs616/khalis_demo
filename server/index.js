@@ -5,10 +5,12 @@ const  path = require('path');
 // initializing express
 const express = require('express');
 const app = express();
+const cors = require('cors');
 
 // setting up views
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 // routes
 require('@routes/app.routes')(app);

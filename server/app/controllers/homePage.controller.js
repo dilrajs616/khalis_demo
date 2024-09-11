@@ -4,7 +4,7 @@ const router = express.Router();
 const fetch = async () => (await import('node-fetch')).default;
 
 
-router.post("/transcript", async (req, res) => {
+router.post("/api/transcript", async (req, res) => {
     const { audioData } = req.body;
     if (!audioData) {
       return res.status(400).json({ error: "No audio data received" });

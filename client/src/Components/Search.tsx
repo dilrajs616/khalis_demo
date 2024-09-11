@@ -31,7 +31,7 @@ export default function Search() {
                 : reader.result;
             console.log(result, typeof result);
           };
-          let url = "https://gurbani-search.onrender.com/transcript";
+          let url = "http://localhost:3000/api/transcript";
           try {
             let response = await fetch(url, {
               method: "POST",
