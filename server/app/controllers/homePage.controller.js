@@ -5,8 +5,10 @@ const fetch = async () => (await import('node-fetch')).default;
 
 
 router.post("/api/transcript", async (req, res) => {
+    console.log(req.body);
     const { audioData } = req.body;
     if (!audioData) {
+      console.log("no audio data");
       return res.status(400).json({ error: "No audio data received" });
     }
 
