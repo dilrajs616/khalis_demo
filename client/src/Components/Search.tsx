@@ -3,6 +3,8 @@ import "../SCSS/Search.scss";
 import { useRef, useState } from "react";
 import { CiMicrophoneOn } from "react-icons/ci";
 import toast from "react-hot-toast";
+import { CiSearch } from "react-icons/ci";
+import ResultDisplay from "./ResultDisplay";
 
 export default function Search() {
   const [isRecording, setisRecording] = useState(false);
@@ -10,8 +12,12 @@ export default function Search() {
   const resultRef = useRef<any>(null);
   let streamRef = useRef<any>(null);
   let chunks: any = [];
+  let inputRef = useRef<HTMLInputElement>(null);
+  const [result, setresult] = useState<any>(null);
+  const [searchType, setsearchType] = useState<string>("gurbani");
 
-  async function listenToVoice() {
+  async function listenToVoice(e: any) {
+    e.preventDefault();
     if (isRecording) {
       recorderRef.current.stop();
       streamRef.current.getTracks().forEach((track: any) => track.stop());
@@ -49,6 +55,9 @@ export default function Search() {
               } else {
                 let data = await response.json();
                 console.log(data);
+                if (inputRef.current) {
+                  inputRef.current.value = data.transcript;
+                }
               }
             } catch (e: any) {
               console.log(e.message);
@@ -61,6 +70,19 @@ export default function Search() {
       setisRecording(true);
     }
   }
+  async function getGurbani(e: any, transcript?: any) {
+    e.preventDefault();
+    const baniDBURL = `https://api.banidb.com/v2/search/${
+      transcript || inputRef.current?.value
+    }?searchtype=2&source=all`;
+    let response = await fetch(baniDBURL);
+    if (!response.ok) {
+      console.log("error");
+    } else {
+      let data = await response.json();
+      setresult(data.verses);
+    }
+  }
 
   return (
     <>
@@ -69,14 +91,25 @@ export default function Search() {
         <div className="content-container">
           <div className="main-heading">ਗੁਰਬਾਣੀ ਖੋਜ</div>
           <div className="search-input-box-container">
-            <input
-              type="search"
-              placeholder="Enter your input please"
-              id="search-box"
-            />
-            <button className="mic-btn">
-              <CiMicrophoneOn size={45} onClick={listenToVoice} />
-            </button>
+            <form className="form" onSubmit={getGurbani}>
+              <input
+                type="search"
+                placeholder="Enter your input please"
+                id="search-box"
+                ref={inputRef}
+              />
+              <button className="mic-btn">
+                <CiMicrophoneOn size={45} onClick={listenToVoice} />
+              </button>
+              <button type="submit" className="search-icon">
+                <CiSearch size={40} onClick={getGurbani} />
+              </button>
+            </form>
+          </div>
+          <div className="results">
+            {result !== null ? (
+              <ResultDisplay resultsFromBaniDB={result} />
+            ) : undefined}
           </div>
         </div>
       </div>

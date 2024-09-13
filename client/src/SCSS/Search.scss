@@ -18,11 +18,22 @@
   font-family: $font-primary;
   color: $color-tertiary;
 }
+.form {
+  display: flex;
+  width: 100%;
+  .search-icon {
+    background-color: transparent;
+    border: 0;
+    outline: 0;
+    color: $color-primary;
+  }
+}
 .search-input-box-container {
   margin-top: 20px;
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 8px;
 }
 #search-box {
   width: 90%;
