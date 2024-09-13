@@ -2,56 +2,62 @@ import Navbar from "./Navbar";
 import "../SCSS/Search.scss";
 import { useRef, useState } from "react";
 import { CiMicrophoneOn } from "react-icons/ci";
+import toast from "react-hot-toast";
+
 export default function Search() {
   const [isRecording, setisRecording] = useState(false);
   const recorderRef = useRef<any>(null);
+  const resultRef = useRef<any>(null);
+  let streamRef = useRef<any>(null);
   let chunks: any = [];
-  let result: any;
+
   async function listenToVoice() {
     if (isRecording) {
       recorderRef.current.stop();
+      streamRef.current.getTracks().forEach((track: any) => track.stop());
       setisRecording(false);
     } else {
-      let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      recorderRef.current = new MediaRecorder(stream);
-
+      streamRef.current = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      recorderRef.current = new MediaRecorder(streamRef.current);
       recorderRef.current.ondataavailable = (e: BlobEvent) => {
         chunks.push(e.data);
       };
       recorderRef.current.onstop = async () => {
+        toast.success("Mic Off");
         let voiceBlog = new Blob(chunks, { type: "audio/wav" });
         chunks = [];
         if (voiceBlog) {
           let reader = new FileReader();
           reader.readAsDataURL(voiceBlog);
           reader.onload = async () => {
-            result =
-              typeof reader.result == "string"
-                ? reader.result.split(",")[1]
-                : reader.result;
-            console.log(result, typeof result);
-          };
-          let url = "http://localhost:3000/api/transcript";
-          try {
-            let response = await fetch(url, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ audioData: result }),
-            });
-            if (!response.ok) {
-              console.log("error", response.status);
-            } else {
-              let data = await response.json();
-              console.log(data);
+            if (reader.result) {
+              resultRef.current = reader.result.toString().split(",")[1];
             }
-          } catch (e: any) {
-            console.log(e.message);
-          }
+            let url = "http://localhost:3000/api/transcript";
+            try {
+              let response = await fetch(url, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ audioData: resultRef.current }),
+              });
+              if (!response.ok) {
+                toast.error("Error Occurred");
+              } else {
+                let data = await response.json();
+                console.log(data);
+              }
+            } catch (e: any) {
+              console.log(e.message);
+            }
+          };
         }
       };
       recorderRef.current.start();
+      toast.success("Mic On");
       setisRecording(true);
     }
   }
