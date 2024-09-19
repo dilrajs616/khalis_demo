@@ -43,7 +43,7 @@ export default function Search() {
             if (reader.result) {
               resultRef.current = reader.result.toString().split(",")[1];
             }
-            let url = "https://gurbani-search.onrender.com/transcript";
+            let url = "http://localhost:3000/api/transcript";
             try {
               let response = await fetch(url, {
                 method: "POST",
@@ -56,11 +56,11 @@ export default function Search() {
                 toast.error("Error Occurred");
               } else {
                 let data = await response.json();
-
+                console.log(data);
                 if (inputRef.current) {
-                  inputRef.current.value = data.transcript;
+                  inputRef.current.value = data.initialChars;
                   if (searchType != "gurabni") {
-                    console.log(data.transcript);
+                    console.log(data.initialChars);
 
                     banis.forEach((bani) => {
                       if (data.transcript == bani.gurmukhiUni) {
