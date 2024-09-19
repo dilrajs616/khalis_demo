@@ -43,7 +43,7 @@ export default function Search() {
             if (reader.result) {
               resultRef.current = reader.result.toString().split(",")[1];
             }
-            let url = "http://localhost:3000/api/transcript";
+            let url = "https://gurbani-search.onrender.com/transcript";
             try {
               let response = await fetch(url, {
                 method: "POST",

@@ -52,8 +52,11 @@ router.post("/api/transcript", async (req, res) => {
       // Extract the transcript from the response
       const transcript = data.results[0]?.alternatives[0]?.transcript || "No transcript available";
 
-      // Send the transcript back in the response
-      res.json({ message: "Transcription successful", transcript });
+      const words = transcript.split(" ");
+      const initialChars = words.map(word => word.charAt(0)).join(" ");
+
+      // Send the first letter of each word back in the response
+      return res.json({ message: "Transcription successful", initialChars });
     } catch (error) {
       console.error("Error:", error.message);
       res.status(500).json({ error: "Internal server error" });
