@@ -5,12 +5,14 @@ import { CiMicrophoneOn } from "react-icons/ci";
 import toast from "react-hot-toast";
 import { CiSearch } from "react-icons/ci";
 import ResultDisplay from "./ResultDisplay";
+import { banis } from "../Data/Bani";
 
 export default function Search() {
   const [isRecording, setisRecording] = useState(false);
   const recorderRef = useRef<any>(null);
   const resultRef = useRef<any>(null);
   let streamRef = useRef<any>(null);
+  let baniRef = useRef<number>(0);
   let chunks: any = [];
   let inputRef = useRef<HTMLInputElement>(null);
   const [result, setresult] = useState<any>(null);
@@ -31,7 +33,7 @@ export default function Search() {
         chunks.push(e.data);
       };
       recorderRef.current.onstop = async () => {
-        toast.success("Mic Off");
+        toast.success("LISTENING, MIC OFF");
         let voiceBlog = new Blob(chunks, { type: "audio/wav" });
         chunks = [];
         if (voiceBlog) {
@@ -54,9 +56,19 @@ export default function Search() {
                 toast.error("Error Occurred");
               } else {
                 let data = await response.json();
-                console.log(data);
+
                 if (inputRef.current) {
                   inputRef.current.value = data.transcript;
+                  if (searchType != "gurabni") {
+                    console.log(data.transcript);
+
+                    banis.forEach((bani) => {
+                      if (data.transcript == bani.gurmukhiUni) {
+                        console.log(bani);
+                        baniRef.current = bani.ID;
+                      }
+                    });
+                  }
                 }
               }
             } catch (e: any) {
@@ -66,24 +78,34 @@ export default function Search() {
         }
       };
       recorderRef.current.start();
-      toast.success("Mic On");
+      toast.success("LISTENING");
       setisRecording(true);
     }
   }
-  async function getGurbani(e: any, transcript?: any) {
+  console.log(searchType);
+  async function getGurbani(e: any) {
     e.preventDefault();
-    const baniDBURL = `https://api.banidb.com/v2/search/${
-      transcript || inputRef.current?.value
-    }?searchtype=2&source=all`;
+    banis.forEach((bani) => {
+      if (inputRef.current?.value == bani.gurmukhiUni) {
+        console.log(bani);
+        baniRef.current = bani.ID;
+      }
+    });
+    const baniDBURL =
+      searchType === "gurbani"
+        ? `https://api.banidb.com/v2/search/${inputRef.current?.value}?searchtype=1&source=all`
+        : `https://api.banidb.com/v2/banis/${baniRef.current}`;
     let response = await fetch(baniDBURL);
     if (!response.ok) {
       console.log("error");
     } else {
       let data = await response.json();
-      setresult(data.verses);
+      setresult(data);
     }
   }
-
+  function handleTypeChnage(e: any) {
+    setsearchType(e.target.value);
+  }
   return (
     <>
       <div className="search-parent-container">
@@ -92,23 +114,41 @@ export default function Search() {
           <div className="main-heading">ਗੁਰਬਾਣੀ ਖੋਜ</div>
           <div className="search-input-box-container">
             <form className="form" onSubmit={getGurbani}>
-              <input
-                type="search"
-                placeholder="Enter your input please"
-                id="search-box"
-                ref={inputRef}
-              />
-              <button className="mic-btn">
-                <CiMicrophoneOn size={45} onClick={listenToVoice} />
-              </button>
-              <button type="submit" className="search-icon">
-                <CiSearch size={40} onClick={getGurbani} />
-              </button>
+              <div className="wrapper">
+                <input
+                  type="search"
+                  placeholder="Enter your input please"
+                  id="search-box"
+                  ref={inputRef}
+                />
+                {/* <button className="mic-btn"> */}
+                <CiMicrophoneOn
+                  size={45}
+                  onClick={listenToVoice}
+                  className={isRecording ? "mic-working" : "mic-btn"}
+                  color="#fd9a10f1"
+                />
+                {/* </button> */}
+                <button type="submit" className="search-icon">
+                  <CiSearch size={40} onClick={getGurbani} />
+                </button>
+              </div>
+              <select name="" id="search-type" onChange={handleTypeChnage}>
+                <option value="gurbani" className="option">
+                  Gurbani
+                </option>
+                <option value="bani" className="option">
+                  Bani (Enter Bani Name)
+                </option>
+              </select>
             </form>
           </div>
           <div className="results">
             {result !== null ? (
-              <ResultDisplay resultsFromBaniDB={result} />
+              <ResultDisplay
+                resultsFromBaniDB={result}
+                searchType={searchType}
+              />
             ) : undefined}
           </div>
         </div>
