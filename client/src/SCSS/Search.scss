@@ -21,35 +21,14 @@
 .form {
   display: flex;
   width: 100%;
-  flex-direction: column;
-  .wrapper {
-    display: flex;
-    margin-bottom: 20px;
-  }
   .search-icon {
+    background-color: transparent;
     border: 0;
     outline: 0;
     color: $color-primary;
-    background-color: rgba(244, 243, 243, 0.979);
-    border-radius: 50%;
-    padding: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 }
-#search-type {
-  padding: 10px;
-  border-radius: 10px;
-  background-color: transparent;
-  border: 1px solid $color-primary;
-  outline: 0;
-  color: $color-tertiary;
-  .option {
-    background-color: $color-background;
-  }
-}
-.wrapper {
+.search-input-box-container {
   margin-top: 20px;
   display: flex;
   align-items: center;
@@ -70,29 +49,9 @@
   appearance: none;
 }
 .mic-btn {
+  background-color: transparent;
   border: 0;
   outline: 0;
   color: $color-primary;
   cursor: pointer;
-  background-color: rgba(244, 243, 243, 0.979);
-  border-radius: 50%;
-}
-.mic-working {
-  animation: listening 1s linear 0s infinite alternate;
-  border-radius: 50%;
-  padding: 0;
-  background-color: rgba(244, 243, 243, 0.979);
-  color: $color-primary;
-  cursor: pointer;
-}
-@keyframes listening {
-  0% {
-    box-shadow: 0 0 18px 0px #fd9a10da;
-  }
-  50% {
-    box-shadow: 0 0 25px 0px #fd9a109d;
-  }
-  100% {
-    box-shadow: 0 0 50px 0px #fd9a10c3;
-  }
 }
