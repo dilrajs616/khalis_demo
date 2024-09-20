@@ -33,7 +33,7 @@ export default function Search() {
         chunks.push(e.data);
       };
       recorderRef.current.onstop = async () => {
-        toast.success("LISTENING, MIC OFF");
+        toast.success("LISTENING STOPPED, MIC OFF");
         let voiceBlog = new Blob(chunks, { type: "audio/wav" });
         chunks = [];
         if (voiceBlog) {
