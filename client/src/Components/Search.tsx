@@ -138,7 +138,7 @@ export default function Search() {
                   Gurbani
                 </option>
                 <option value="bani" className="option">
-                  Bani (Enter Bani Name)
+                  Bani (Enter Bani Name Voice bani search is under development)
                 </option>
               </select>
             </form>
