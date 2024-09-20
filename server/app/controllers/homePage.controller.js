@@ -1,74 +1,66 @@
-require('dotenv').config()
-const express = require('express');
+require("dotenv").config();
+const express = require("express");
 const router = express.Router();
-const fetch = async () => (await import('node-fetch')).default;
+const fetch = async () => (await import("node-fetch")).default;
 
+router.post("/transcript", async (req, res) => {
+  const { audioData, initials } = req.body;
+  if (!audioData) {
+    return res.status(400).json({ error: "No audio data received" });
+  }
 
-router.post("/api/transcript", async (req, res) => {
-    console.log(req.body);
-    const { audioData } = req.body;
-    if (!audioData) {
-      console.log("no audio data");
-      return res.status(400).json({ error: "No audio data received" });
+  // Define the API endpoint and API key
+  const apiKey = process.env.GOOGLE_API_KEY;
+  const apiEndPoint = `https://speech.googleapis.com/v1/speech:recognize?key=${apiKey}`;
+
+  // Set up the request payload for the Google Cloud Speech-to-Text API
+  const requestBody = {
+    audio: {
+      content: audioData, // The base64-encoded audio data
+    },
+    config: {
+      encoding: "WEBM_OPUS", // Adjust the encoding if needed
+      sampleRateHertz: 48000,
+      languageCode: "pa-IN", // Punjabi language code
+    },
+  };
+
+  try {
+    // Import fetch dynamically
+    const fetchModule = await fetch();
+    const response = await fetchModule(apiEndPoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    // Check if the API response was successful
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Google API Error:", errorText);
+      return res.status(500).json({ error: "Error transcribing audio" });
     }
 
-    // Define the API endpoint and API key
-    const apiKey = process.env.GOOGLE_API_KEY;
-    const apiEndPoint = `https://speech.googleapis.com/v1/speech:recognize?key=${apiKey}`;
+    // Parse the API response
+    const data = await response.json();
 
-    // Set up the request payload for the Google Cloud Speech-to-Text API
-    const requestBody = {
-      audio: {
-        content: audioData, // The base64-encoded audio data
-      },
-      config: {
-        encoding: "WEBM_OPUS", // Adjust the encoding if needed
-        sampleRateHertz: 48000,
-        languageCode: "pa-IN", // Punjabi language code
-      },
-    };
+    // Extract the transcript from the response
+    let transcript = data.results[0]?.alternatives[0]?.transcript || "No transcript available";
 
-    try {
-      // Import fetch dynamically
-      const fetchModule = await fetch();
-      const response = await fetchModule(apiEndPoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      // Check if the API response was successful
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Google API Error:", errorText);
-        return res.status(500).json({ error: "Error transcribing audio" });
-      }
-
-      // Parse the API response
-      const data = await response.json();
-
-      // Extract the transcript from the response
-      let transcript = data.results[0]?.alternatives[0]?.transcript || "No transcript available";
-
-      if (initials) {
-        const words = transcript.split(" ");
-        const initialChars = words.map(word => word.charAt(0)).join(" ");
-        transcript = initialChars;
-      }
-
-      // Send the transcript back in the response
-      return res.json({ message: "Transcription successful", transcript });
-    } catch (error) {
-      console.error("Error:", error.message);
-      res.status(500).json({ error: "Internal server error" });
+    if (initials) {
+      const words = transcript.split(" ");
+      const initialChars = words.map(word => word.charAt(0)).join(" ");
+      transcript = initialChars;
     }
-});
 
-router.post('/gurbani', async (req, res) => {
-  const transcript = "this endpoint is under work";
-  res.json({ message: "Working on it", transcript });
+    // Send the transcript back in the response
+    return res.json({ message: "Transcription successful", transcript });
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 module.exports = router;
