@@ -43,14 +43,17 @@ export default function Search() {
             if (reader.result) {
               resultRef.current = reader.result.toString().split(",")[1];
             }
-            let url = "http://localhost:3000/api/transcript";
+            let url = "http://localhost:3000/transcript";
             try {
               let response = await fetch(url, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ audioData: resultRef.current }),
+                body: JSON.stringify({
+                  audioData: resultRef.current,
+                  initials: searchType === "gurbani" ? true : false,
+                }),
               });
               if (!response.ok) {
                 toast.error("Error Occurred");
@@ -58,9 +61,9 @@ export default function Search() {
                 let data = await response.json();
                 console.log(data);
                 if (inputRef.current) {
-                  inputRef.current.value = data.initialChars;
+                  inputRef.current.value = data.transcript;
                   if (searchType != "gurabni") {
-                    console.log(data.initialChars);
+                    console.log(data.transcript);
 
                     banis.forEach((bani) => {
                       if (data.transcript == bani.gurmukhiUni) {
@@ -82,7 +85,7 @@ export default function Search() {
       setisRecording(true);
     }
   }
-  console.log(searchType);
+
   async function getGurbani(e: any) {
     e.preventDefault();
     banis.forEach((bani) => {
@@ -138,7 +141,7 @@ export default function Search() {
                   Gurbani
                 </option>
                 <option value="bani" className="option">
-                  Bani (Enter Bani Name Voice bani search is under development)
+                  Bani
                 </option>
               </select>
             </form>
