@@ -1,0 +1,17 @@
+@import "./Variable";
+.shabad-container {
+  background: $color-background;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .shabad-content-container {
+    max-width: 800px;
+    padding: 10px;
+  }
+  .shabad-line {
+    color: $color-tertiary;
+    font-size: 1.5rem;
+    line-height: 2.8rem;
+  }
+}
