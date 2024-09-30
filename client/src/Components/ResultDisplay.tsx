@@ -1,5 +1,8 @@
-import { useEffect, useState } from "react";
+import { useContext } from "react";
+import { ShabadContext } from "../Context/ShabadContext";
 import "../SCSS/ResultDisplay.scss";
+import { Link } from "react-router-dom";
+
 interface Props {
   resultsFromBaniDB: any;
   searchType: string;
@@ -9,6 +12,11 @@ export default function ResultDisplay({
   searchType,
 }: Props) {
   console.log(resultsFromBaniDB);
+  const { shabad, setShabad } = useContext(ShabadContext);
+  function handleShabadCcontext(shabadID: number): void {
+    setShabad(shabadID);
+  }
+  console.log(shabad);
   return (
     <>
       <div className="result-display-container">
@@ -16,14 +24,22 @@ export default function ResultDisplay({
         {searchType === "gurbani"
           ? resultsFromBaniDB.verses.map((gurbani: any, index: number) => {
               return (
-                <div className="result-display-container" key={index}>
-                  <div className="result-display-gurbani-name">
-                    {gurbani.verse.unicode}
+                <Link to={"/shabad"} style={{ textDecoration: "none" }}>
+                  <div
+                    className="result-display-container"
+                    key={index}
+                    onClick={() => {
+                      handleShabadCcontext(gurbani.shabadId);
+                    }}
+                  >
+                    <div className="result-display-gurbani-name">
+                      {gurbani.verse.unicode}
+                    </div>
+                    <div className="result-display-gurbani-ang">
+                      Ang Number -{gurbani.pageNo}
+                    </div>
                   </div>
-                  <div className="result-display-gurbani-ang">
-                    Ang Number -{gurbani.pageNo}
-                  </div>
-                </div>
+                </Link>
               );
             })
           : resultsFromBaniDB.verses.map((bani: any) => {

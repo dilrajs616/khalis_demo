@@ -1,11 +1,20 @@
-import Navbar from "./Components/Navbar";
+import { HashRouter, Route, Routes } from "react-router-dom";
+
 import Search from "./Components/Search";
+import Shabad from "./Components/Shabad";
+import { ShabadContextProvider } from "./Context/ShabadContext";
 
 function App() {
   return (
     <>
-      {/* <Navbar /> */}
-      <Search />
+      <ShabadContextProvider>
+        <HashRouter>
+          <Routes>
+            <Route path="/" element={<Search />} />
+            <Route path="/Shabad" element={<Shabad />} />
+          </Routes>
+        </HashRouter>
+      </ShabadContextProvider>
     </>
   );
 }
