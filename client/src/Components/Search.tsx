@@ -43,7 +43,8 @@ export default function Search() {
             if (reader.result) {
               resultRef.current = reader.result.toString().split(",")[1];
             }
-            let url = "http://localhost:3000/transcript";
+            let url =
+              "https://punjabi-transcript-82115345315.asia-southeast2.run.app/transcript";
             try {
               let response = await fetch(url, {
                 method: "POST",
